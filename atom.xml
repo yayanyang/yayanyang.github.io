@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>yayanyang の blog</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yayanyang.github.io/"/>
+  <updated>2017-10-16T02:47:22.000Z</updated>
+  <id>http://yayanyang.github.io/</id>
+  
+  <author>
+    <name>yayanyang yayanyang@gmail.com</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>如何加速区块链？</title>
+    <link href="http://yayanyang.github.io/2017/10/15/boost-blockchain/"/>
+    <id>http://yayanyang.github.io/2017/10/15/boost-blockchain/</id>
+    <published>2017-10-15T08:34:49.000Z</published>
+    <updated>2017-10-16T02:47:22.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最开始BTC定义了分布式记账系统这个区块链的最主要功能，然后ETHER将DAPP引入了进来。到现在为止我们都在如何提高DAPP的性能的道路上蹒跚前行，本文尝试从区块链底层算法的角度去诠释这个问题的本质以及给出几个有意思的解决方案。大家会看到现有的各种所谓的公有链3.0都是在这个思路上的一种自然延伸，当然有些做得很傻有些很聪明。</p><h2 id="关于一致性的传说"><a href="#关于一致性的传说" class="headerlink" title="关于一致性的传说"></a>关于一致性的传说</h2><p>在说一致性之前，我们来侃侃分布式系统节最有名的CAP理论：</p><blockquote><p>2000年7月，加州大学伯克利分校的Eric Brewer教授在ACM PODC会议上提出CAP猜想。2年后，麻省理工学院的Seth Gilbert和Nancy Lynch从理论上证明了CAP。之后，CAP理论正式成为分布式计算领域的公认定理。</p></blockquote><h4 id="CAP理论概述"><a href="#CAP理论概述" class="headerlink" title="CAP理论概述"></a>CAP理论概述</h4><p>一个分布式系统最多只能同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三项中的两项。</p><img src="/2017/10/15/boost-blockchain/cap.jpg" alt="cap.jpg" title=""><p><strong><em>这里就不展开描述CAP理论了，进一步的细节可以看这里<a href="http://www.hollischuang.com/archives/666" target="_blank" rel="external">CAP</a></em></strong></p><h4 id="区块链的CAP理论"><a href="#区块链的CAP理论" class="headerlink" title="区块链的CAP理论"></a>区块链的CAP理论</h4><p>和大多数人的直觉相反，传统的公有区块链（BTC，ETHER等）满足了CAP里面的一致性和分区容错性，在上图的位置恰好就是问号部分。</p><p>选择CP代表区块链的最初决策者认为：</p><ol><li>区块链的分区情况是会频繁发生的；</li><li>相对于可用性，我们要用某种处理来补偿分区情况下引入的错误；</li><li>一致性没什么好说的啦，分布式记账没有一致性还搞毛线；</li></ol><p>一个有趣的事实，我们在区块链上的交易最好要等待N个块的去人才能<strong>认为</strong>这个交易成功了。这个基于大多数人都知道的事实区块链会在链分叉的时候自动抛弃短的那条链。这个处理其实就是对分区恢复后的补偿操作。</p><p>我们得到的明显副作用就是我们在链上的交易可用性到了惨不忍睹的地步：现在以BTC/太坊交易越来越慢动，交易所转账不动就等待半个小时。</p><h4 id="区块链交易好龟毛"><a href="#区块链交易好龟毛" class="headerlink" title="区块链交易好龟毛"></a>区块链交易好龟毛</h4><p>区块链由于选择CAP里面的CP天生自带龟毛光环。难道无救了？我们在说区块链慢的时候我们其实在说某个具体的用户的主观感受：</p><blockquote><ol><li>等待打包好慢啊；</li><li>还要等待N个块确认；</li><li>为啥出块速度这么慢？</li></ol></blockquote><p>我们先不讨论出块速度的问题，专心解决下等待打包的问题。</p><p><strong>对于一个大的并发系统来说，我们解决低延迟的最好办法就是在不牺牲一致性的前提下通过并行处理的方式增加系统的吞吐量</strong></p><blockquote><p>为啥不能通过提高单点执行速度来提高整个网络的事务吞吐量，我能甩一筐🙄给你不？根据木桶理论，整个系统的性能天花板是由最短的那块木板决定的。对于一个去中心化自治的系统来说要求所有参与的节点都具有高配置无疑是一种错误的决策选择；另一些联盟链其实是牺牲了去中心化或者CAP里面里面的分区容错性来达到提高系统吞吐量的目的的。</p></blockquote><p>多说一句</p><blockquote><p><strong><em> 从经济学上来说，一个脱了裤子放屁的系统也注定会被淘汰掉。抛开区块链的概念，我们来设想改进一家公司的工作效率：肯定是让更多的人动起来并行的做事，而不是反过来要求能做事的人加班996不行还要007，这样的公司已经离死亡不远了。 </em></strong></p></blockquote><p>废话了很多，下面来说说正事。在前面的限制条件下提高系统吞吐量的不二法则就是：<strong><em>增加块的大小</em></strong> 同时让网络 <strong><em>并行的处理打包</em></strong></p><p>看过<a href="https://yayanyang.github.io/2017/10/10/zilliqa/">这篇</a>的朋友可能马上就反应过来了：zilliqa/DAG 都是在提高网络的并行打包能力。</p><blockquote><p>废话一句：BTC扩容富了好多人啊。</p></blockquote><h2 id="to-be-continue"><a href="#to-be-continue" class="headerlink" title="to be continue"></a>to be continue</h2><p>由于前面已经有专门文章分析zilliqa之类的并行处理网络，这里就不展开描述并行处理网络的实现了。 zilliqa它其实已经证明了在不改变CP的选择以及POW的工作量证明的前提下实现并行打包处理是可行的。</p><blockquote><p>区块链网络是一个巨大的计算/存储资源，仅仅用来做分布式记账太浪费了。在释放并行记账能力的基础上，进一步放宽事务一致性的限制让巨大的计算资源服务于通用计算其实是一个很好的发展方向😆😆</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;最开始BTC定义了分布式记账系统这个区块链的最主要功能，然后ETHER将DAPP引入了进来。到现在为止我们都在如何提高DAPP的性能的道路上
+      
+    
+    </summary>
+    
+    
+      <category term="区块链" scheme="http://yayanyang.github.io/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>unibrowser - 区块链浏览器项目简介</title>
+    <link href="http://yayanyang.github.io/2017/10/10/unibrowser/"/>
+    <id>http://yayanyang.github.io/2017/10/10/unibrowser/</id>
+    <published>2017-10-10T07:22:49.000Z</published>
+    <updated>2017-10-17T09:20:19.311Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="我们的小目标"><a href="#我们的小目标" class="headerlink" title="我们的小目标"></a>我们的小目标</h3><p>现在的区块链产业就好比互联网刚刚兴起的蛮荒时期，充斥着各种geek技术欣欣向荣。但是~~ 借用狄更斯的名言：</p><blockquote><p>这是最好的时代，也是最坏的时代</p></blockquote><p>技术高速发展的背后是整个区块链产业对消费端市场的不重视，各种工具远远未达到对普通用户友好易用的程度；另一方面区块链技术的高速发展同时各种新链层出不穷，也为提供好的工具制造了不小的门槛。</p><blockquote><p>他山之石，可以攻玉。我们观察几年前手游行业，很早的时候Unity/Cocos Creator等三方平台就将各种移动平台的技术差异屏蔽，推出统一的移动平台游戏渲染开发框架。为后续的手游行业大爆发奠定了坚实的技术基础——大量的游戏初创业公司，无需去关注更底层的图形技术细节只需要专注于游戏的业务逻辑考虑游戏怎么好玩就好了。</p></blockquote><p>对于区块链产业，我们是否有这样一个平台：</p><ol><li>专注于区块链的客户端应用；</li><li>内建大部分区块链产业所需要用到的密码学算法；</li><li>内建类似于微信小程序一样的UI系统；</li><li>内建各种复杂报表，行情UI组建（为对接交易所，各种投资报表做准备）；</li><li>内建标准协议通信层，方便和链通信；以及内建的消息推送通道；</li><li>基于这个平台，使用js/lua之类的脚本语言构建真正的区块链客户端应用；</li><li>平台的内建部分（2，3，4，5）能够通过脚本方便的扩展；</li><li>应用要足够小，轻量级。能够像网页一样被下载到我们的浏览器运行；</li><li>这个平台要足够开放，并且足够安全；所有认证的用户都能自由的发布应用，并且应用能够被跟踪管理；</li><li>这是一个跨平台的运行时；我们不仅需要手机上运行，而且应用也要能够无缝的运行在pc上；</li></ol><p>是否有这样的一个平台了？答案应该是否定的</p><blockquote><p>基于个人的眼界，很有可能有其它项目已经这么干了。欢迎交流！！！</p></blockquote><h3 id="UNIBROWSER-能干什么？"><a href="#UNIBROWSER-能干什么？" class="headerlink" title="UNIBROWSER 能干什么？"></a>UNIBROWSER 能干什么？</h3><p>这个项目的灵感直接来源于区块链上的钱包项目，有了它<strong>妈妈再也不用担心有那么多钱包需要对接了</strong>：</p><ol><li>各种钱包可以共用相同的UI界面，可能不同钱包根据它的支付参数UI界面会有微调；</li><li>共用底层的基础密码学算法；</li><li>共用通讯层协议；</li><li>共用资产价格查询平台；</li><li>开发不同链的tx报文；</li><li>对接不同链的tx通知接口；</li></ol><p>如上所述 1，2，3，4点都可以共用，大大减少了开发的工作量；同时对于新链来说也不需要单独去全新开发整个钱包应用，只需要定制开发4，5点就可以了。</p><h4 id="更多脑洞"><a href="#更多脑洞" class="headerlink" title="更多脑洞"></a>更多脑洞</h4><ol><li>和区块链相关的多媒体网络出版行业，资讯投资一条龙服务；</li><li>交易所的轻量级客户端；</li><li>专业的区块链跨平台运维浏览工具；</li><li>OTC交易客户端；</li></ol><h4 id="生态很重要"><a href="#生态很重要" class="headerlink" title="生态很重要"></a>生态很重要</h4><blockquote><p>开放的生态很重要，标准也很重要；</p></blockquote><p>通过提供标准化的基础平台降低整个区块链产业客户端应用开发的成本，<strong><em>应用开发者只需要关心业务逻辑其它困难部分交给专业人士/平台就好了</em></strong>。</p><p>另一方面开放的插件/应用标准接口为应用开发者在不同的unibrowser实现之间自由切换提供了可能,有竞争才能有进步。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;我们的小目标&quot;&gt;&lt;a href=&quot;#我们的小目标&quot; class=&quot;headerlink&quot; title=&quot;我们的小目标&quot;&gt;&lt;/a&gt;我们的小目标&lt;/h3&gt;&lt;p&gt;现在的区块链产业就好比互联网刚刚兴起的蛮荒时期，充斥着各种geek技术欣欣向荣。但是~~ 借用狄更斯的名言：
+      
+    
+    </summary>
+    
+    
+      <category term="区块链" scheme="http://yayanyang.github.io/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="unibrowser" scheme="http://yayanyang.github.io/tags/unibrowser/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>zilliqa 简单分析报告</title>
+    <link href="http://yayanyang.github.io/2017/10/10/zilliqa/"/>
+    <id>http://yayanyang.github.io/2017/10/10/zilliqa/</id>
+    <published>2017-10-10T04:23:50.000Z</published>
+    <updated>2017-10-15T08:41:14.246Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h2><ul><li>让公有区块链能够支持1000+TX/s的事务处理速度；</li><li>在尽量不牺牲传统区块链安全性的基础上达成以上目标</li></ul><h2 id="怎么干的"><a href="#怎么干的" class="headerlink" title="怎么干的"></a>怎么干的</h2><p><strong>传统软件架构里面有一句经典台词</strong></p><blockquote><p>通过简单地增加另外一个间接层就可以解决软件的任何问题</p></blockquote><p>zilliqa在整个系统的架构设计上充分的利用这一点来对传统的区块链进行改造。</p><p><strong>一个假设</strong></p><blockquote><p>现有的公有区块链的节点规模已经远远超过了整个链进行安全交易所需的最小数目集</p></blockquote><p>下面围绕这两个方面来展开描述zilliqa的软件架构设计</p><p>###如何提高链的事务吞吐量</p><p>一般来说提高系统事务吞吐量无非两种方法：</p><ol><li>调高单个节点的处理速度；</li><li>将事务处理并行化；</li></ol><p>zilliqa聪明的利用了之前提及的假设将整个区块链网络划分为若干个子网络独立的进行事务处理。以此来达到提高整个网络事务吞吐量的目的</p><blockquote><p>zilliqa测试网（4 Shards, 2,400 Nodes）已经能够达到1389TX/s,是现有eth网络的100倍</p><p>PS：daglabs采用相同的思路来提高网络吞吐，但是它采用了在算法上比链更复杂的DAG结构来实现，这个在工程实现上没有zilliqa来得直观和有效</p></blockquote><p>后面我们统一用<strong><em>共识组</em></strong>来指代zilliqa中的子网络</p><h3 id="共识组之间的共识"><a href="#共识组之间的共识" class="headerlink" title="共识组之间的共识"></a>共识组之间的共识</h3><p>类似于大数据处理中的MapReduce算法，共识组是并行的Map处理单元。为了得到最终的结果也就是一条单一的区块链，我们需要一个Reduce过程。这个过程需要共识组之外的一个协调者来完成这个过程，zilliqa的解决方案是再增加一层管理网络。</p><p>这种架构风格熟悉传统分布式数据库的同学一定不会陌生：</p><ol><li>Raft/Paxos协议实现一个小的分布式元数据库，负责元数据存储以及分布式事务调度管理；</li><li>大量其它节点，负责具体数据的存储分布式索引的建立等等；</li></ol><h4 id="zilliqa管理层网络"><a href="#zilliqa管理层网络" class="headerlink" title="zilliqa管理层网络"></a>zilliqa管理层网络</h4><p>再一次引用</p><blockquote><p>通过简单地增加另外一个间接层就可以解决软件的任何问题</p></blockquote><p>现在zilliqa要解决的问题有：</p><ol><li>如何产生管理层网络？</li><li>这个网络能不能抵抗女巫攻击？</li><li>这个网络会不会被少数人控制？</li><li>它是一个严格的去区中心化实现吗？</li></ol><p>要解答上面问题其实都涉及到随机性以及多数人共识的问题：</p><ol><li>这个管理层节点集合不能是固定不变的；</li><li>同时这个管理层节点集合是随机的不可预期的；</li><li>作为一个去中心化的组织，多数人的共识让这个组织显得更纯粹；</li></ol><blockquote><p>上面1，2两点保证了zilliqa管理层网络的流动性，避免了任何僵化组织都会面对的弊端：垄断和既得利益层作恶</p></blockquote><p>zilliqa网络巧妙的通过一个独立的PoW1共识层算法来选举这个管理层网络。所有zilliqa节点都可以公平的通过PoW1挖矿进入管理层网络候选列表；</p><p>现在来解决管理层流动性的问题：</p><ol><li>zilliqa规定整个网络的拓扑不是固定不变的。每隔t时间间隔需要重新选举管理层网络，并且重新划分共识组；按照zilliqa白皮书这段时间称为DS-epoch；</li><li>zilliqa预设了管理层网络的大小为n，它永远指向完成了PoW1挖矿算法的候选节点列表的前N个；</li><li>管理层网络候选列表是一个先进先出的FIFO队列，每个DS-epoch阶段开始zilliqa自动将header节点移除列表；</li></ol><blockquote><p>这里出现的PoW1以及后面出现的PoW2 指的是两种不同的PoW算法</p></blockquote><p>zilliqa管理层网络是有leader的网络。默认最新加入的节点为当前DS-epoch的leader，同时zilliqa通过一个复议协议将作恶的leader投票出管理层；</p><h4 id="zilliqa共识组"><a href="#zilliqa共识组" class="headerlink" title="zilliqa共识组"></a>zilliqa共识组</h4><p>如前所述共识组的划分也不是一直不变的，为了更好的抵御攻击提高随机性zilliqa再次拿起了PoW算法：</p><ol><li>所有要参与共识组挖矿的节点，在每个DS-epoch阶段开始前要先完成一个额外的挖矿过程——PoW2挖矿</li><li>所有完成PoW2挖矿的节点，被提交到管理层网络。由管理层网络根据时间顺序分组；</li></ol><p>共识组内部采用改进的PBFT共识协议，具体详情参看白皮书（p7）</p><h4 id="双花问题"><a href="#双花问题" class="headerlink" title="双花问题"></a>双花问题</h4><p>所有分布式事务都是在解决事务的原子性问题，并行处理本质上和原子性是对立的两方面；zilliqa在解决这个问题上用了一个小的技巧，漂亮的解决了这个问题：</p><ol><li>我们的目标是提高系统的事务处理能；</li><li>对于强调一致性的系统来说，单个用户的事务排队处理是一个完全能够接受的限制；</li><li>那么zilliqa就规定某个用户在一个特定的DS-epoch，它所有的事务都必须路由到同一个共识组处理</li></ol><blockquote><p>这样zilliqa将问题简化为在某个共识组内部如何解决双花问题</p></blockquote><h3 id="zilliqa节点角色总结"><a href="#zilliqa节点角色总结" class="headerlink" title="zilliqa节点角色总结"></a>zilliqa节点角色总结</h3><ul><li>作为管理层节点</li><li>作为管理层leader节点</li><li>作为共识组节点</li><li>作为共识组leader节点</li></ul><blockquote><p>zilliqa节点在每个DS-epoch随机的转换角色</p></blockquote><h3 id="共识算法终结"><a href="#共识算法终结" class="headerlink" title="共识算法终结"></a>共识算法终结</h3><ol><li>产生管理层的共识算法PoW1</li><li>产生共识组的共识算法Pow2</li><li>共识组内部执行具体事务的改进版PBFT</li></ol><h3 id="合约很重要"><a href="#合约很重要" class="headerlink" title="合约很重要"></a>合约很重要</h3><p>zilliqa的合约采用dataflow范式的语言编写，<strong>它不是图灵完备的</strong></p><p>zilliqa认为区块链的计算更接近于传统的数据流处理程序，因此它的整个合约的计算更接近于Hadoop/MaxCompute(aliyun)的计算模型——所有节点都分阶段的参与计算的某个步骤，然后由某个节点来汇总结果。</p><blockquote><p>注意zilliqa合约的计算是完全并行化的，这个与传统的eth合约完全不同。它能够充分利用网络的计算资源，来进行大批量的数据处理工作，这个是eth合约无法做到的。</p><p>PS：这部分还未看到实际代码，具体实现的细节需要进一步研究。这里还遗留了一些问题，例如：安全怎么保证，如何防止女巫节点串改中间数据等等？</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;设计目标&quot;&gt;&lt;a href=&quot;#设计目标&quot; class=&quot;headerlink&quot; title=&quot;设计目标&quot;&gt;&lt;/a&gt;设计目标&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;让公有区块链能够支持1000+TX/s的事务处理速度；&lt;/li&gt;
+&lt;li&gt;在尽量不牺牲传统区块链安全性的基础上达
+      
+    
+    </summary>
+    
+    
+      <category term="区块链" scheme="http://yayanyang.github.io/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="分析报告" scheme="http://yayanyang.github.io/tags/%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/"/>
+    
+  </entry>
+  
+</feed>
