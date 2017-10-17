@@ -9,7 +9,9 @@
       if is_archive()
         a.current(href="/archives")= __('Archive')
       else
-        a(href="/archives")= __('Archive')	
+        a(href="/archives")= __('Archive')
+    li
+      a(href="/atom.xml")= __('RSS')  	
   .information
     .back_btn
       li

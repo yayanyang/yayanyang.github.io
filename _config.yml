@@ -79,6 +79,13 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: anatolec
+plugin:
+  - hexo-generator-feed
+
+feed:
+type: atom
+path: atom.xml
+limit: 20
 
 github: yayanyang
 twitter: zeusever
