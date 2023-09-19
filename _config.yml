@@ -107,6 +107,9 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: ana
 
+plugins:
+  - hexo-footnotes
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
