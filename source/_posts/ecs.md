@@ -1,6 +1,6 @@
 ---
 layout: blog
-title: 放弃面向对象,拥抱ECS
+title: 实现继承是什么鬼，ECS才是未来
 date: 2023-09-20 00:10:09
 tags:
 ---
