@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>unibrowser - 区块链浏览器项目简介 · YAYANYANG の BLOG</title><meta name="description" content="#我们的小目标
+现在的区块链产业就好比互联网刚刚兴起的蛮荒时期，充斥着各种geek技术欣欣向荣。但是~~ 借用狄更斯的名言：
+
+这是最好的时代，也是最坏的时代
+
+技术高速发展的背后是整个区块链产业对消费端市场的不重视，各种工具远远未达到对普通用户友好易用的程度；另一方面区块链技术的高速发展同时各种新"><meta name="keywords"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="../../../../css/style.css"><link rel="stylesheet" href="../../../../css/blog_basic.css"><link rel="stylesheet" href="../../../../css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 6.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="../../../../images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">YAYANYANG の BLOG</a></h3></div></div><ul class="social-links"></ul><div class="footer"><a target="_blank" href="/"><span>Theme by </span></a><a target="_blank" rel="noopener" href="https://www.caicai.me"> CaiCai </a><span>&</span><a target="_blank" rel="noopener" href="https://github.com/Ben02/hexo-theme-Anatole"> Ben</a><div class="by_farbox"><a href="https://hexo.io/zh-cn/" target="_blank">Proudly published with Hexo&#65281;</a></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/about">关于</a></li><li><a href="/archives">归档</a></li><li><a href="/links">友链</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div><div class="avatar"><img></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>unibrowser - 区块链浏览器项目简介</a></h3></div><div class="post-content"><h3 id="我们的小目标"><a class="header-anchor" href="#我们的小目标">#</a>我们的小目标</h3>
+<p>现在的区块链产业就好比互联网刚刚兴起的蛮荒时期，充斥着各种geek技术欣欣向荣。但是~~ 借用狄更斯的名言：</p>
+<blockquote>
+<p>这是最好的时代，也是最坏的时代</p>
+</blockquote>
+<p>技术高速发展的背后是整个区块链产业对消费端市场的不重视，各种工具远远未达到对普通用户友好易用的程度；另一方面区块链技术的高速发展同时各种新链层出不穷，也为提供好的工具制造了不小的门槛。</p>
+<blockquote>
+<p>他山之石，可以攻玉。我们观察几年前手游行业，很早的时候Unity/Cocos Creator等三方平台就将各种移动平台的技术差异屏蔽，推出统一的移动平台游戏渲染开发框架。为后续的手游行业大爆发奠定了坚实的技术基础——大量的游戏初创业公司，无需去关注更底层的图形技术细节只需要专注于游戏的业务逻辑考虑游戏怎么好玩就好了。</p>
+</blockquote>
+<p>对于区块链产业，我们是否有这样一个平台：</p>
+<ol>
+<li>专注于区块链的客户端应用；</li>
+<li>内建大部分区块链产业所需要用到的密码学算法；</li>
+<li>内建类似于微信小程序一样的UI系统；</li>
+<li>内建各种复杂报表，行情UI组建（为对接交易所，各种投资报表做准备）；</li>
+<li>内建标准协议通信层，方便和链通信；以及内建的消息推送通道；</li>
+<li>基于这个平台，使用js/lua之类的脚本语言构建真正的区块链客户端应用；</li>
+<li>平台的内建部分（2，3，4，5）能够通过脚本方便的扩展；</li>
+<li>应用要足够小，轻量级。能够像网页一样被下载到我们的浏览器运行；</li>
+<li>这个平台要足够开放，并且足够安全；所有认证的用户都能自由的发布应用，并且应用能够被跟踪管理；</li>
+<li>这是一个跨平台的运行时；我们不仅需要手机上运行，而且应用也要能够无缝的运行在pc上；</li>
+</ol>
+<p>是否有这样的一个平台了？答案应该是否定的</p>
+<blockquote>
+<p>基于个人的眼界，很有可能有其它项目已经这么干了。欢迎交流！！！</p>
+</blockquote>
+<h3 id="UNIBROWSER-能干什么？"><a class="header-anchor" href="#UNIBROWSER-能干什么？">#</a>UNIBROWSER 能干什么？</h3>
+<p>这个项目的灵感直接来源于区块链上的钱包项目，有了它<strong>妈妈再也不用担心有那么多钱包需要对接了</strong>：</p>
+<ol>
+<li>各种钱包可以共用相同的UI界面，可能不同钱包根据它的支付参数UI界面会有微调；</li>
+<li>共用底层的基础密码学算法；</li>
+<li>共用通讯层协议；</li>
+<li>共用资产价格查询平台；</li>
+<li>开发不同链的tx报文；</li>
+<li>对接不同链的tx通知接口；</li>
+</ol>
+<p>如上所述 1，2，3，4点都可以共用，大大减少了开发的工作量；同时对于新链来说也不需要单独去全新开发整个钱包应用，只需要定制开发4，5点就可以了。</p>
+<h4 id="更多脑洞"><a class="header-anchor" href="#更多脑洞">#</a>更多脑洞</h4>
+<ol>
+<li>和区块链相关的多媒体网络出版行业，资讯投资一条龙服务；</li>
+<li>交易所的轻量级客户端；</li>
+<li>专业的区块链跨平台运维浏览工具；</li>
+<li>OTC交易客户端；</li>
+</ol>
+<h4 id="生态很重要"><a class="header-anchor" href="#生态很重要">#</a>生态很重要</h4>
+<blockquote>
+<p>开放的生态很重要，标准也很重要；</p>
+</blockquote>
+<p>通过提供标准化的基础平台降低整个区块链产业客户端应用开发的成本，<em><strong>应用开发者只需要关心业务逻辑其它困难部分交给专业人士/平台就好了</strong></em>。</p>
+<p>另一方面开放的插件/应用标准接口为应用开发者在不同的unibrowser实现之间自由切换提供了可能,有竞争才能有进步。</p>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2017-10-10</span><i class="fa fa-tag"></i><a class="tag" href="/tags/区块链/" title="区块链">区块链 </a><a class="tag" href="/tags/unibrowser/" title="unibrowser">unibrowser </a></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://yayanyang.github.io/2017/10/10/unibrowser/,YAYANYANG の BLOG,unibrowser - 区块链浏览器项目简介,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="../../15/boost-blockchain/" title="如何加速区块链？">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="../zilliqa/" title="zilliqa 简单分析报告">下一篇</a></li></ul></div></div></div></div></div><script src="../../../../js/jquery.js"></script><script src="../../../../js/jquery-migrate-1.2.1.min.js"></script><script src="../../../../js/jquery.appear.js"></script></body></html>

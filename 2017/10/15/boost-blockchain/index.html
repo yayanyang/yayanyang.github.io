@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>如何加速区块链？ · YAYANYANG の BLOG</title><meta name="description" content="#前言
+最开始BTC定义了分布式记账系统这个区块链的最主要功能，然后ETHER将DAPP引入了进来。到现在为止我们都在如何提高DAPP的性能的道路上蹒跚前行，本文尝试从区块链底层算法的角度去诠释这个问题的本质以及给出几个有意思的解决方案。大家会看到现有的各种所谓的公有链3.0都是在这个思路上的一种自"><meta name="keywords"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="../../../../css/style.css"><link rel="stylesheet" href="../../../../css/blog_basic.css"><link rel="stylesheet" href="../../../../css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 6.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="../../../../images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">YAYANYANG の BLOG</a></h3></div></div><ul class="social-links"></ul><div class="footer"><a target="_blank" href="/"><span>Theme by </span></a><a target="_blank" rel="noopener" href="https://www.caicai.me"> CaiCai </a><span>&</span><a target="_blank" rel="noopener" href="https://github.com/Ben02/hexo-theme-Anatole"> Ben</a><div class="by_farbox"><a href="https://hexo.io/zh-cn/" target="_blank">Proudly published with Hexo&#65281;</a></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/about">关于</a></li><li><a href="/archives">归档</a></li><li><a href="/links">友链</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div><div class="avatar"><img></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>如何加速区块链？</a></h3></div><div class="post-content"><h2 id="前言"><a class="header-anchor" href="#前言">#</a>前言</h2>
+<p>最开始BTC定义了分布式记账系统这个区块链的最主要功能，然后ETHER将DAPP引入了进来。到现在为止我们都在如何提高DAPP的性能的道路上蹒跚前行，本文尝试从区块链底层算法的角度去诠释这个问题的本质以及给出几个有意思的解决方案。大家会看到现有的各种所谓的公有链3.0都是在这个思路上的一种自然延伸，当然有些做得很傻有些很聪明。</p>
+<h2 id="关于一致性的传说"><a class="header-anchor" href="#关于一致性的传说">#</a>关于一致性的传说</h2>
+<p>在说一致性之前，我们来侃侃分布式系统节最有名的CAP理论：</p>
+<blockquote>
+<p>2000年7月，加州大学伯克利分校的Eric Brewer教授在ACM PODC会议上提出CAP猜想。2年后，麻省理工学院的Seth Gilbert和Nancy Lynch从理论上证明了CAP。之后，CAP理论正式成为分布式计算领域的公认定理。</p>
+</blockquote>
+<h4 id="CAP理论概述"><a class="header-anchor" href="#CAP理论概述">#</a>CAP理论概述</h4>
+<p>一个分布式系统最多只能同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三项中的两项。</p>
+<img src="2017/10/15/boost-blockchain/cap.jpg" class="">
+<p><em><strong>这里就不展开描述CAP理论了，进一步的细节可以看这里<a target="_blank" rel="noopener" href="http://www.hollischuang.com/archives/666">CAP</a></strong></em></p>
+<h4 id="区块链的CAP理论"><a class="header-anchor" href="#区块链的CAP理论">#</a>区块链的CAP理论</h4>
+<p>和大多数人的直觉相反，传统的公有区块链（BTC，ETHER等）满足了CAP里面的一致性和分区容错性，在上图的位置恰好就是问号部分。</p>
+<p>选择CP代表区块链的最初决策者认为：</p>
+<ol>
+<li>区块链的分区情况是会频繁发生的；</li>
+<li>相对于可用性，我们要用某种处理来补偿分区情况下引入的错误；</li>
+<li>一致性没什么好说的啦，分布式记账没有一致性还搞毛线；</li>
+</ol>
+<p>一个有趣的事实，我们在区块链上的交易最好要等待N个块的去人才能<strong>认为</strong>这个交易成功了。这个基于大多数人都知道的事实区块链会在链分叉的时候自动抛弃短的那条链。这个处理其实就是对分区恢复后的补偿操作。</p>
+<p>我们得到的明显副作用就是我们在链上的交易可用性到了惨不忍睹的地步：现在以BTC/太坊交易越来越慢动，交易所转账不动就等待半个小时。</p>
+<h4 id="区块链交易好龟毛"><a class="header-anchor" href="#区块链交易好龟毛">#</a>区块链交易好龟毛</h4>
+<p>区块链由于选择CAP里面的CP天生自带龟毛光环。难道无救了？我们在说区块链慢的时候我们其实在说某个具体的用户的主观感受：</p>
+<blockquote>
+<ol>
+<li>等待打包好慢啊；</li>
+<li>还要等待N个块确认；</li>
+<li>为啥出块速度这么慢？</li>
+</ol>
+</blockquote>
+<p>我们先不讨论出块速度的问题，专心解决下等待打包的问题。</p>
+<p><strong>对于一个大的并发系统来说，我们解决低延迟的最好办法就是在不牺牲一致性的前提下通过并行处理的方式增加系统的吞吐量</strong></p>
+<blockquote>
+<p>为啥不能通过提高单点执行速度来提高整个网络的事务吞吐量，我能甩一筐🙄给你不？根据木桶理论，整个系统的性能天花板是由最短的那块木板决定的。对于一个去中心化自治的系统来说要求所有参与的节点都具有高配置无疑是一种错误的决策选择；另一些联盟链其实是牺牲了去中心化或者CAP里面里面的分区容错性来达到提高系统吞吐量的目的的。</p>
+</blockquote>
+<p>多说一句</p>
+<blockquote>
+<p>*** 从经济学上来说，一个脱了裤子放屁的系统也注定会被淘汰掉。抛开区块链的概念，我们来设想改进一家公司的工作效率：肯定是让更多的人动起来并行的做事，而不是反过来要求能做事的人加班996不行还要007，这样的公司已经离死亡不远了。 ***</p>
+</blockquote>
+<p>废话了很多，下面来说说正事。在前面的限制条件下提高系统吞吐量的不二法则就是：<em><strong>增加块的大小</strong></em> 同时让网络 <em><strong>并行的处理打包</strong></em></p>
+<p>看过<a href="https://yayanyang.github.io/2017/10/10/zilliqa/">这篇</a>的朋友可能马上就反应过来了：zilliqa/DAG 都是在提高网络的并行打包能力。</p>
+<blockquote>
+<p>废话一句：BTC扩容富了好多人啊。</p>
+</blockquote>
+<h2 id="to-be-continue"><a class="header-anchor" href="#to-be-continue">#</a>to be continue</h2>
+<p>由于前面已经有专门文章分析zilliqa之类的并行处理网络，这里就不展开描述并行处理网络的实现了。 zilliqa它其实已经证明了在不改变CP的选择以及POW的工作量证明的前提下实现并行打包处理是可行的。</p>
+<blockquote>
+<p>区块链网络是一个巨大的计算/存储资源，仅仅用来做分布式记账太浪费了。在释放并行记账能力的基础上，进一步放宽事务一致性的限制让巨大的计算资源服务于通用计算其实是一个很好的发展方向😆😆</p>
+</blockquote>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2017-10-15</span><i class="fa fa-tag"></i><a class="tag" href="/tags/区块链/" title="区块链">区块链 </a></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://yayanyang.github.io/2017/10/15/boost-blockchain/,YAYANYANG の BLOG,如何加速区块链？,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="../../../../2022/10/04/sbt/" title="关于灵魂绑定币的一些猜想">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="../../10/unibrowser/" title="unibrowser - 区块链浏览器项目简介">下一篇</a></li></ul></div></div></div></div></div><script src="../../../../js/jquery.js"></script><script src="../../../../js/jquery-migrate-1.2.1.min.js"></script><script src="../../../../js/jquery.appear.js"></script></body></html>

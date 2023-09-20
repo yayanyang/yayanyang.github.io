@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>放弃面向对象,拥抱ECS · YAYANYANG の BLOG</title><meta name="description" content="#几点思考
+
+当人们谈论面向对象缺点的时候，他们的潜台词多半是想说实现继承的问题；
+Rust语言是面向对象的吗，为什么在Rust中实现简单点链表都很困难？
+除了面向对象以外，是否有其它更高效硬件友好的设计思路，来实现良好的封装和内聚？
+
+#开端
+最近我在设计一款基于Rust的UI框架,我给它定义了几"><meta name="keywords"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="../../../../css/style.css"><link rel="stylesheet" href="../../../../css/blog_basic.css"><link rel="stylesheet" href="../../../../css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 6.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="../../../../images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">YAYANYANG の BLOG</a></h3></div></div><ul class="social-links"></ul><div class="footer"><a target="_blank" href="/"><span>Theme by </span></a><a target="_blank" rel="noopener" href="https://www.caicai.me"> CaiCai </a><span>&</span><a target="_blank" rel="noopener" href="https://github.com/Ben02/hexo-theme-Anatole"> Ben</a><div class="by_farbox"><a href="https://hexo.io/zh-cn/" target="_blank">Proudly published with Hexo&#65281;</a></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/about">关于</a></li><li><a href="/archives">归档</a></li><li><a href="/links">友链</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div><div class="avatar"><img></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>放弃面向对象,拥抱ECS</a></h3></div><div class="post-content"><h2 id="几点思考"><a class="header-anchor" href="#几点思考">#</a>几点思考</h2>
+<ul>
+<li>当人们谈论<code>面向对象</code>缺点的时候，他们的潜台词多半是想说<code>实现继承</code>的问题；</li>
+<li>Rust语言是面向对象的吗，为什么在Rust中实现简单点链表都很困难？</li>
+<li>除了<code>面向对象</code>以外，是否有其它更高效硬件友好的设计思路，来实现良好的<code>封装</code>和<code>内聚</code>？</li>
+</ul>
+<h2 id="开端"><a class="header-anchor" href="#开端">#</a>开端</h2>
+<p>最近我在设计一款<code>基于Rust的UI框架</code>,我给它定义了几个设计目标：</p>
+<ul>
+<li>
+<p>它应该是一个标准的响应式UI框架；</p>
+</li>
+<li>
+<p>同时它必须支持<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/learnwin32/retained-mode-versus-immediate-mode"><code>Retained Mode</code></a>；</p>
+</li>
+<li>
+<p>使用原生Rust代码配置组件和界面，类似 <code>SwiftUI</code> / <code>Compose</code>；</p>
+</li>
+<li>
+<p>跨平台,使用 <code>skia</code> / <code>webgpu</code> 作为渲染后端；</p>
+</li>
+<li>
+<p>在可预见的将来，它应该能够很容易的支持各种 <code>脚本</code> / <code>动态语言</code> 集成；</p>
+</li>
+</ul>
+<h3 id="设想很美好现实很残酷"><a class="header-anchor" href="#设想很美好现实很残酷">#</a>设想很美好现实很残酷</h3>
+<p><s>咋一看， 整个项目雄心万丈！！！ 目标远大。。</s></p>
+<p>首先整个项目是参考flutter的渲染管线设计，如下图所示：</p>
+<p><img src="pipeline.png" alt="pipeline"></p>
+<p>这里的巨坑在于,如何在Rust中实现上图的第三颗树<code>Render elements + tree</code>；在设计的第一个版本，我想当然耳的照搬<code>flutter</code>的设计, 尝试在Rust中模拟了一个多重继承+多态的架构：</p>
+<ul>
+<li>使用 <code>Varaint</code><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> + <code>Box + dyn trait</code> 模拟多态；</li>
+<li>使用 <code>Rc&lt;RefCell&lt;T&gt;&gt;</code> 跳开 Rust 对可变引用的<code>严格约束</code><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>；</li>
+<li>使用 <code>Trait 默认实现</code> 来模拟<code>实现继承</code>；</li>
+</ul>
+<p>随着代码的推进，最大的槽点出在对<code>Rc&lt;RefCell&lt;T&gt;&gt;</code>的使用，以及<code>实现继承</code>带来的调用栈困境：</p>
+<ul>
+<li>使用面向对象来设计<code>树型结构</code>，最经典的案例就是浏览器的DOM；</li>
+<li>这往往要求，某个算法过程在<code>树型结构</code>的不同节点间来回调用，对象<code>重入</code><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>在所难免；</li>
+<li>这就要求你不能简单的对<code>树型结构</code>的节点对象使用<code>Rc&lt;RefCell&lt;T&gt;&gt;</code>，你需要精心设计控制节点对象的哪些字段在运行时<code>可变读写</code><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup>：<br>
+<img src="refcell.png" alt="refcell"></li>
+</ul>
+<p>这让我肥肠蛋痛～～ 更不用说，后续开发一直要和各种 <code>树型结构</code> 打交道，这让我一度想放弃这个伟大的项目！！！！！</p>
+<p>虽然我一如既往的没有常性，但是这次运气好，那天刚好翻到一个 <code>Rust crate</code><sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> 它给了我灵感；</p>
+<ul>
+<li>既然添加间接层是解决软件架构的不二法门；</li>
+<li>既然对象的读写字段分散到不同的多态对象中，很难管理；</li>
+</ul>
+<p>我草， <strong>为啥不把这些数据字段放到一个统一的表中管理</strong> ！！！</p>
+<p>在这里不得不说大龄程序员就是见多识广，妥妥的抄袭几十年前C语言的优化方案。但是我绝对不会承认这点，我将努力向你证明这是更高级的数据表结构，将点燃新的rust设计范式 —— 毕竟毛主席告诉我们，事物都是螺旋往复向上发展的<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup>…<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>。</p>
+<h2 id="发展"><a class="header-anchor" href="#发展">#</a>发展</h2>
+<p>继续沿着这个思路思考下去：</p>
+<ul>
+<li>我的问题域是，我需要在内存中为渲染管线构建多颗渲染树<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup>；</li>
+<li>其次树与树节点间是一一对应的，例如：Widget -&gt; Element -&gt; RenderObject;<br>
+<img src="3tree.png" alt="nodes"></li>
+<li>如果把横向的三个节点数据放到一行，给这行一个唯一ID来表示这个映射关系；</li>
+<li>这样我就得到了一个，二维内存表；</li>
+<li>模仿数据库的SQL语法，给这个二维表提供一个统一的 <code>读写/更新/删除</code> 操作接口。。。</li>
+</ul>
+<p>等等。。。。这尼玛不就是<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Entity_component_system"><code>ECS模式</code></a>，仙人板板，搞了半天重新发明了一遍轮子。</p>
+<p>这太没面子了我绝不承认这是<code>ECS</code>；看着这个讨厌的Entitiy，我觉得它很不程序员，所以我决定把它叫做 <code>Dynamic Object ID</code></p>
+<p>是的这个内存表，你可以把它认为是一个动态对象系统，因为：</p>
+<ul>
+<li>你可以动态创建一个对象，这个时候它是一个Duck类型<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>；</li>
+<li>对象ID就是数据表的某行，这个时候除了Row ID，其它列都为空；</li>
+<li>你可以动态修改对象表现类型，例如：如果你希望它是个Element对象，你可以在Element列写入Element对象数据；</li>
+<li>既要也要，这个动态类型既可以是一个Element对象也可以是一个RenderObject对象。只需重复上一步动作填入RenderObject对象数据；显然这个动态对象是一个既要也要的渣女：（，文明点不带性别对立的说法，我们有了多重继承体系，结合<code>System</code><sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup> 顺带把<code>实现继承</code>也实现了。</li>
+<li>如上所述，你可以针对某列数据做<code>动态方法绑定</code>。它既像面向对象语言中的对象方法，又和它有一些区别，更强大。它是针对整个类型数据做统一操作，更加cpu cache友好更高效；</li>
+<li>理论上，你也可以针对某个动态对象编写<code>动态方法绑定</code>；</li>
+<li>同时它完美解决了前述Rust的痛点，只要你让这张表：
+<ul>
+<li>～Sync + ～Send<sup class="footnote-ref"><a href="#fn11" id="fnref11">[11]</a></sup>；</li>
+<li>对它使用 <code>Rc&lt;RefCell&lt;T&gt;&gt;</code>；</li>
+</ul>
+</li>
+</ul>
+<p>我为这个模式取了一个新名字 <code>DLR</code><sup class="footnote-ref"><a href="#fn12" id="fnref12">[12]</a></sup>。</p>
+<h2 id="高潮"><a class="header-anchor" href="#高潮">#</a>高潮</h2>
+<p>一直认为没有高潮的运动，是不完整的。所以最后必须颅内高潮，发散下思维：</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>遵循Rust的伟大实践…… 我们这里将 <code>enum 类型</code> 统称为 <code>Variant</code>。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Rust为了实现严格的所有权系统以及并发重入安全,同一个变量只允许有一个可变引用存在。 <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>成也萧何，败也萧何。solidity一定很羡慕Rust没有重入的问题：））））） <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p>也就是在运行时调用 <code>Rc&lt;RefCell&lt;T&gt;&gt;</code> 上的 <a target="_blank" rel="noopener" href="https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.borrow"><code>borrow</code></a> 以及 <a target="_blank" rel="noopener" href="https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.borrow_mut"><code>borrow_mut</code></a> 方法。 <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn5" class="footnote-item"><p><a target="_blank" rel="noopener" href="https://docs.rs/indextree/latest/indextree/index.html">indextree</a> <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn6" class="footnote-item"><p>也可能是马列恩，其中一个大爷说的。感谢我的大学<code>马列</code>老师，把那么枯燥的教条主义课程讲解得如此的深入浅出而不那么教条主义；到现在还能指引我的思维方式。 <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn7" class="footnote-item"><p>也可能螺旋向下，比如归零币 ～～ <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn8" class="footnote-item"><p>为什么需要多颗渲染树，这涉及到渲染优化和增量更新，具体可以参考 <code>raphlinus</code> 的这篇<a target="_blank" rel="noopener" href="https://raphlinus.github.io/ui/druid/2019/11/22/reactive-ui.html"><code>文章</code></a>；如果你熟悉编译原理，它也能类比编译各个阶段的抽象树结构，更恰当的类比是各种动态语言运行时的状态机。 <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn9" class="footnote-item"><p>我不打算告诉你，什么是鸭子类型～～ 如果你用过 python / ruby 当我没说。 <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn10" class="footnote-item"><p>当然，我给它重新取了个名字叫做：动态方法绑定。 <a href="#fnref10" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn11" class="footnote-item"><p>说人话：让这张表既不能在线程间传递，也不是同步安全的 <a href="#fnref11" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn12" class="footnote-item"><p>希望微软不会找我要版权费。。。。。 <a href="#fnref12" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-20</span><i class="fa fa-tag"></i></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://yayanyang.github.io/2023/09/20/ecs/,YAYANYANG の BLOG,放弃面向对象,拥抱ECS,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="../../../01/27/cross-chain-payment-network/" title="所有链的L2小额支付网络">下一篇</a></li></ul></div></div></div></div></div><script src="../../../../js/jquery.js"></script><script src="../../../../js/jquery-migrate-1.2.1.min.js"></script><script src="../../../../js/jquery.appear.js"></script></body></html>
