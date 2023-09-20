@@ -48,8 +48,8 @@ external_link:
   exclude: ""
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
-relative_link: false
+post_asset_folder: true
+relative_link: true
 future: true
 highlight:
   enable: true
@@ -107,8 +107,27 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: ana
 
-plugins:
-  - hexo-footnotes
+# Markdown-it config
+markdown:
+  render:
+    html: true
+    xhtmlOut: false
+    breaks: true
+    linkify: true
+    typographer: true
+    quotes: "“”‘’"
+  plugins:
+    - markdown-it-abbr
+    - markdown-it-footnote
+    - markdown-it-ins
+    - markdown-it-sub
+    - markdown-it-sup
+  anchors:
+    level: 2
+    collisionSuffix: "v"
+    permalink: true
+    permalinkClass: header-anchor
+    permalinkSymbol: "#"
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment

@@ -29,9 +29,9 @@ tags:
 
 ~~咋一看， 整个项目雄心万丈！！！ 目标远大。。~~
 
-首先整个项目是参考的flutter的渲染管线，如下图所示：
+首先整个项目是参考flutter的渲染管线设计，如下图所示：
 
-![pipeline](img/pipeline.png)
+![pipeline](pipeline.png)
 
 这里的巨坑在于,如何在Rust中实现上图的第三颗树`Render elements + tree`；在设计的第一个版本，我想当然耳的照搬`flutter`的设计, 尝试在Rust中模拟了一个多重继承+多态的架构：
 
@@ -44,7 +44,7 @@ tags:
 * 使用面向对象来设计`树型结构`，最经典的案例就是浏览器的DOM；
 * 这往往要求，某个算法过程在`树型结构`的不同节点间来回调用，对象`重入`[^3]在所难免；
 * 这就要求你不能简单的对`树型结构`的节点对象使用`Rc<RefCell<T>>`，你需要精心设计控制节点对象的哪些字段在运行时`可变读写`[^4]：
-![refcell](img/refcell.png)
+![refcell](refcell.png)
 
 这让我肥肠蛋痛～～ 更不用说，后续开发一直要和各种 `树型结构` 打交道，这让我一度想放弃这个伟大的项目！！！！！
 
@@ -63,7 +63,7 @@ tags:
 
 * 我的问题域是，我需要在内存中为渲染管线构建多颗渲染树[^8]；
 * 其次树与树节点间是一一对应的，例如：Widget -> Element -> RenderObject;
-![nodes](img/3tree.png)
+![nodes](3tree.png)
 * 如果把横向的三个节点数据放到一行，给这行一个唯一ID来表示这个映射关系；
 * 这样我就得到了一个，二维内存表；
 * 模仿数据库的SQL语法，给这个二维表提供一个统一的 `读写/更新/删除` 操作接口。。。
@@ -90,17 +90,15 @@ tags:
 
 一直认为没有高潮的运动，是不完整的。所以最后必须颅内高潮，发散下思维：
 
-## 参考
-
-[^1] 遵循Rust的伟大实践…… 我们这里将 `enum 类型` 统称为 `Variant`。
-[^2] Rust为了实现严格的所有权系统以及并发重入安全,同一个变量只允许有一个可变引用存在。
-[^3] 成也萧何，败也萧何。solidity一定很羡慕Rust没有重入的问题：）））））
-[^4] 也就是在运行时调用 `Rc<RefCell<T>>` 上的 [`borrow`](https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.borrow) 以及 [`borrow_mut`](https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.borrow_mut) 方法。
-[^5] [indextree](https://docs.rs/indextree/latest/indextree/index.html)
-[^6] 也可能是马列恩，其中一个大爷说的。感谢我的大学`马列`老师，把那么枯燥的教条主义课程讲解得如此的深入浅出而不那么教条主义；到现在还能指引我的思维方式。
-[^7] 也可能螺旋向下，比如归零币 ～～
-[^8] 为什么需要多颗渲染树，这涉及到渲染优化和增量更新，具体可以参考 `raphlinus` 的这篇[`文章`](https://raphlinus.github.io/ui/druid/2019/11/22/reactive-ui.html)；如果你熟悉编译原理，它也能类比编译各个阶段的抽象树结构，更恰当的类比是各种动态语言运行时的状态机。
-[^9] 我不打算告诉你，什么是鸭子类型～～ 如果你用过 python / ruby 当我没说。
-[^10] 当然，我给它重新取了个名字叫做：动态方法绑定。
-[^11] 希望微软不会找我要版权费。。。。。
-[^12] 说人话：让这张表既不能在线程间传递，也不是同步安全的
+[^1]: 遵循Rust的伟大实践…… 我们这里将 `enum 类型` 统称为 `Variant`。
+[^2]: Rust为了实现严格的所有权系统以及并发重入安全,同一个变量只允许有一个可变引用存在。
+[^3]: 成也萧何，败也萧何。solidity一定很羡慕Rust没有重入的问题：）））））
+[^4]: 也就是在运行时调用 `Rc<RefCell<T>>` 上的 [`borrow`](https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.borrow) 以及 [`borrow_mut`](https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.borrow_mut) 方法。
+[^5]: [indextree](https://docs.rs/indextree/latest/indextree/index.html)
+[^6]: 也可能是马列恩，其中一个大爷说的。感谢我的大学`马列`老师，把那么枯燥的教条主义课程讲解得如此的深入浅出而不那么教条主义；到现在还能指引我的思维方式。
+[^7]: 也可能螺旋向下，比如归零币 ～～
+[^8]: 为什么需要多颗渲染树，这涉及到渲染优化和增量更新，具体可以参考 `raphlinus` 的这篇[`文章`](https://raphlinus.github.io/ui/druid/2019/11/22/reactive-ui.html)；如果你熟悉编译原理，它也能类比编译各个阶段的抽象树结构，更恰当的类比是各种动态语言运行时的状态机。
+[^9]: 我不打算告诉你，什么是鸭子类型～～ 如果你用过 python / ruby 当我没说。
+[^10]: 当然，我给它重新取了个名字叫做：动态方法绑定。
+[^11]: 希望微软不会找我要版权费。。。。。
+[^12]: 说人话：让这张表既不能在线程间传递，也不是同步安全的
